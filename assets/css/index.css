@@ -1,0 +1,11 @@
+/* Custom card shadow for login form */
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Center the login form nicely on larger screens */
+@media (min-width: 768px) {
+    .container {
+        margin-top: 100px;
+    }
+}

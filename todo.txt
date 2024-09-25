@@ -1,0 +1,4 @@
+cont with addcourse.php
+diff db for lecturer and student ???????
+update login
+complete manage coure, and user
