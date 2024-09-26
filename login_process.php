@@ -6,38 +6,57 @@ require_once 'includes/db.php';  // Connect to your database
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
+
+    // Basic input validation (you may add more validation if needed)
+    if (empty($username) || empty($password)) {
+        header('Location: index.php?error=Please fill out all fields');
+        exit();
+    }
 
     // Query the database to check if the user exists
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->execute([$username]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch the result as an associative array
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
+    $stmt->bindParam(':username', $username);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch the result as an associative array
 
     // Check if the user was found
-    if ($result) {
-        // Check the password against the stored hash
-        if (password_verify($password, $result['password'])) {
+    if ($user) {
+        // Verify the provided password with the hashed password in the database
+        if (password_verify($password, $user['password'])) {
             // Regenerate session ID to prevent session fixation attacks
-            session_regenerate_id();
+            session_regenerate_id(true);
 
-            // Start a session or handle successful login
-            $_SESSION['username'] = $result['username'];
-            $_SESSION['role'] = $result['role'];
+            // Set session variables for successful login
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
 
-            // Redirect to the dashboard based on the user's role
-            if ($result['role'] === 'admin') {
-                header('Location: admin/dashboard.php');
-            } elseif ($result['role'] === 'lecturer') {
-                header('Location: lecturer/dashboard.php');
-            } elseif ($result['role'] === 'student') {
-                header('Location: student/dashboard.php');
+            // Redirect to the appropriate dashboard based on the user's role
+            switch ($user['role']) {
+                case 'admin':
+                    header('Location: admin/dashboard.php');
+                    exit();
+                case 'lecturer':
+                    header('Location: lecturer/dashboard.php');
+                    exit();
+                case 'student':
+                    header('Location: student/dashboard.php');
+                    exit();
+                default:
+                    // In case the role is unexpected
+                    header('Location: index.php?error=Invalid user role');
+                    exit();
             }
-            exit();
         } else {
-            $error = "Invalid password!";
+            // Invalid password
+            header('Location: index.php?error=Invalid username or password');
+            exit();
         }
     } else {
-        $error = "Invalid username!";
+        // Invalid username
+        header('Location: index.php?error=Invalid username or password');
+        exit();
     }
 }
