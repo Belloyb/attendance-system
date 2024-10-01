@@ -2,10 +2,8 @@
 // Start the session
 session_start();
 
-// Initialize $error variable to store messages from login process
-if (!isset($error)) {
-    $error = '';  // Ensure $error is defined to prevent undefined variable warnings
-}
+// Check if there's an error passed via the URL query string
+$error = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : '';
 
 // Check if the user is already logged in and redirect based on their role
 if (isset($_SESSION['role'])) {
@@ -21,8 +19,6 @@ if (isset($_SESSION['role'])) {
             exit();
     }
 }
-
-// $_SESSION['user_id'] = $lecturer_id;  // After successful login
 
 ?>
 
@@ -58,10 +54,12 @@ if (isset($_SESSION['role'])) {
                 <div class="card-body">
                     <h3 class="card-title text-center mb-4">Attendance System Login</h3>
 
+                    <!-- Display error if available -->
                     <?php if (!empty($error)): ?>
-                        <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+                        <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
 
+                    <!-- Login form -->
                     <form action="login_process.php" method="POST">
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>

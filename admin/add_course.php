@@ -28,12 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = 'All fields are required.';
     } else {
         // Insert into the database
-        $query = "INSERT INTO courses (course_name, level, semester, lecturer_id) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO courses (course_code, course_name, level, semester, lecturer_id) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
-        $stmt->bindParam(1, $course_name);
-        $stmt->bindParam(2, $level);
-        $stmt->bindParam(3, $semester);
-        $stmt->bindParam(4, $lecturer_id);
+        $stmt->bindParam(1, $course_code);
+        $stmt->bindParam(2, $course_name);
+        $stmt->bindParam(3, $level);
+        $stmt->bindParam(4, $semester);
+        $stmt->bindParam(5, $lecturer_id);
 
         if ($stmt->execute()) {
             // Redirect to manage_courses.php on success
@@ -58,6 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <form action="add_course.php" method="POST">
         <!-- Course Name Field -->
+        <div class="form-group">
+            <label for="course_name">Course code:</label>
+            <input type="text" class="form-control" name="course_name" required>
+        </div>
         <div class="form-group">
             <label for="course_name">Course Name:</label>
             <input type="text" class="form-control" name="course_name" required>
