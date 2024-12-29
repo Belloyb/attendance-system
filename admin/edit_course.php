@@ -47,13 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = 'All fields are required.';
     } else {
         // Update the course in the database
-        $query = "UPDATE courses SET course_name = ?, level = ?, semester = ?, lecturer_id = ? WHERE course_id = ?";
+        $query = "UPDATE courses SET course_code = ?,course_name = ?, level = ?, semester = ?, lecturer_id = ? WHERE course_id = ?";
         $stmt = $conn->prepare($query);
-        $stmt->bindParam(1, $course_name);
-        $stmt->bindParam(2, $level);
-        $stmt->bindParam(3, $semester);
-        $stmt->bindParam(4, $lecturer_id);
-        $stmt->bindParam(5, $course_id);
+        $stmt->bindParam(1, $course_code);
+        $stmt->bindParam(2, $course_name);
+        $stmt->bindParam(3, $level);
+        $stmt->bindParam(4, $semester);
+        $stmt->bindParam(5, $lecturer_id);
+        $stmt->bindParam(6, $course_id);
 
         if ($stmt->execute()) {
             // Redirect to manage_courses.php on success
@@ -77,6 +78,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <?php endif; ?>
 
     <form action="edit_course.php?id=<?php echo $course_id; ?>" method="POST">
+        <!-- Course code Field -->
+        <div class="form-group">
+            <label for="course_name">Course Code:</label>
+            <input type="text" class="form-control" name="course_code" value="<?php echo htmlspecialchars($course['course_code']); ?>" required>
+        </div>
         <!-- Course Name Field -->
         <div class="form-group">
             <label for="course_name">Course Name:</label>

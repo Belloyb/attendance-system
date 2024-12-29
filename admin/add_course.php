@@ -16,15 +16,15 @@ $stmt = $conn->prepare($query);
 $stmt->execute();
 $lecturers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $course_name = $_POST['course_name'];
+    $course_code = $_POST['course_code']; // Fetch course code
+    $course_name = $_POST['course_name']; // Fetch course name
     $level = $_POST['level'];
     $semester = $_POST['semester'];
     $lecturer_id = $_POST['lecturer'];
 
     // Validate input
-    if (empty($course_name) || empty($level) || empty($semester) || empty($lecturer_id)) {
+    if (empty($course_code) || empty($course_name) || empty($level) || empty($semester) || empty($lecturer_id)) {
         $error = 'All fields are required.';
     } else {
         // Insert into the database
@@ -58,11 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <?php endif; ?>
 
     <form action="add_course.php" method="POST">
-        <!-- Course Name Field -->
+        <!-- Course Code Field -->
         <div class="form-group">
-            <label for="course_name">Course code:</label>
-            <input type="text" class="form-control" name="course_name" required>
+            <label for="course_code">Course Code:</label>
+            <input type="text" class="form-control" name="course_code" required>
         </div>
+
+        <!-- Course Name Field -->
         <div class="form-group">
             <label for="course_name">Course Name:</label>
             <input type="text" class="form-control" name="course_name" required>
@@ -91,16 +93,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
 
         <!-- Lecturer Dropdown -->
-<div class="form-group">
-    <label for="lecturer">Assign Lecturer:</label>
-    <select name="lecturer" id="lecturer" class="form-control" required>
-        <option value="">Select Lecturer</option>
-        <?php foreach ($lecturers as $lecturer) : ?>
-            <option value="<?php echo $lecturer['user_id']; ?>"><?php echo $lecturer['full_name']; ?></option>
-        <?php endforeach; ?>
-    </select>
-</div>
-
+        <div class="form-group">
+            <label for="lecturer">Assign Lecturer:</label>
+            <select name="lecturer" id="lecturer" class="form-control" required>
+                <option value="">Select Lecturer</option>
+                <?php foreach ($lecturers as $lecturer) : ?>
+                    <option value="<?php echo $lecturer['user_id']; ?>"><?php echo $lecturer['full_name']; ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
         <!-- Submit Button -->
         <button type="submit" class="btn btn-success mt-3">Add Course</button>

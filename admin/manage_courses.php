@@ -33,6 +33,7 @@ $courses = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all courses as associativ
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Course code</th>
                 <th>Course Name</th>
                 <th>Lecturer</th>
                 <th>Actions</th>
@@ -45,6 +46,7 @@ if (count($courses) > 0) {
     foreach ($courses as $row) {
         echo "<tr>";
         echo "<td>" . $row['course_id'] . "</td>";
+        echo "<td>" . $row['course_code'] . "</td>";
         echo "<td>" . $row['course_name'] . "</td>";
         echo "<td>" . $row['lecturer_id'] . "</td>";
         echo "<td>
