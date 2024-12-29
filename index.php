@@ -1,6 +1,6 @@
 <?php
 // Start the session
-session_start();
+
 
 // Check if there's an error passed via the URL query string
 $error = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : '';
@@ -20,6 +20,7 @@ if (isset($_SESSION['role'])) {
     }
 }
 
+include 'login_process.php';
 ?>
 
 <!DOCTYPE html>
@@ -27,13 +28,25 @@ if (isset($_SESSION['role'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="assets/logo/attnlg.jpg" rel="icon">
     <title>Login - Attendance System</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/bootstrap-5.3.3-dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS for centering the login form -->
     <style>
         body, html {
             height: 100%;
+            margin: 0;
+        }
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('assets/logo/umyu.jpeg') no-repeat center center/cover;
+            filter: blur(5px);
+            z-index: -1;
         }
         .login-container {
             height: 100%;
@@ -44,15 +57,23 @@ if (isset($_SESSION['role'])) {
         .card {
             padding: 20px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+        }
+        .card img {
+            display: block;
+            margin: 0 auto 20px;
         }
     </style>
 </head>
 <body>
+    <div class="background"></div>
     <div class="login-container">
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
                     <h3 class="card-title text-center mb-4">Attendance System Login</h3>
+                    <img src="assets/logo/12821518377_smalllogo.png" alt="Logo" style="width:100px; height:100px;">
 
                     <!-- Display error if available -->
                     <?php if (!empty($error)): ?>
