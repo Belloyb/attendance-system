@@ -41,22 +41,11 @@ class pageHeader {
                             <li class="nav-item">
                                 <a class="nav-link" href="../admin/manage_courses.php">Manage Courses</a>
                             </li>
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a class="nav-link" href="../admin/report.php">Reports</a>
-                            </li>
+                            </li> -->
                             <?php
-                        } elseif ($role === 'lecturer') {
-                            ?>
-                            <li class="nav-item">
-                            <a class="nav-link" href="../lecturer/dashboard.php">Home</a>
-                        </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="../lecturer/mark_attendance.php">Mark Attendance</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="../lecturer/view_students.php">View Students</a>
-                            </li>
-                            <?php
+                        
                         } elseif ($role === 'student') {
                             ?>
                             <li class="nav-item">

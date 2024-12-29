@@ -1,210 +1,150 @@
 <?php
 session_start();
-
-// Includes
 require_once '../includes/db.php';
-include '../includes/auth.php';  // Authentication check
-include '../includes/header.php';  // Header
+require_once '../includes/auth.php';
+include_once 'header.php';
 
-// Session expiration check
-$session_lifetime = 30 * 60; // 30 minutes
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $session_lifetime) {
-    session_unset();
-    session_destroy();
-    header('Location: ../index.php'); // Redirect to login page
-    exit();
-}
-$_SESSION['last_activity'] = time();
-
-// After successful login, set session variables
-$_SESSION['user_id'] = $user['user_id']; // Set user ID
-$_SESSION['username'] = $user['username']; // Set username
-$_SESSION['email'] = $user['email']; // Set email
-
-// Ensure the user is a lecturer
+// Check if lecturer is logged in
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'lecturer') {
-    header('Location: ../index.php');
-    exit();
+    die("Access denied. Lecturer not logged in.");
 }
 
-$lecturer_id = $_SESSION['user_id']; // Lecturer's user ID
-$lecturer_name = $_SESSION['username']; // Assuming username or name is stored in the session
+$lecturer_id = $_SESSION['user_id']; // Assuming lecturer ID is stored as user_id in the session
 
-// Fetch courses assigned to the lecturer
-$stmt = $conn->prepare("SELECT * FROM courses WHERE lecturer_id = :lecturer_id");
-$stmt->bindParam(':lecturer_id', $lecturer_id, PDO::PARAM_INT);
-$stmt->execute();
-$courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$course_count = count($courses); // Count of courses taught
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Fetch the total number of students across all courses the lecturer teaches
-$studentStmt = $conn->prepare("
-    SELECT COUNT(DISTINCT student_id) AS total_students 
-    FROM student_courses 
-    WHERE course_id IN (SELECT course_id FROM courses WHERE lecturer_id = :lecturer_id)
-");
-$studentStmt->bindParam(':lecturer_id', $lecturer_id, PDO::PARAM_INT);
-$studentStmt->execute();
-$student_count = $studentStmt->fetch(PDO::FETCH_ASSOC)['total_students'];
+    // Fetch the total number of courses assigned
+    $stmt = $conn->prepare("SELECT COUNT(*) AS total_courses FROM courses WHERE lecturer_id = :lecturer_id");
+    $stmt->bindParam(':lecturer_id', $lecturer_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $total_courses = $stmt->fetchColumn();
 
-// Fetch total attendance records for each course taught by the lecturer
-$attendanceStmt = $conn->prepare("
-    SELECT courses.course_name, COUNT(attendance.id) AS total_attendance 
-    FROM attendance
-    INNER JOIN courses ON attendance.course_id = courses.course_id
-    WHERE courses.lecturer_id = :lecturer_id
-    GROUP BY courses.course_name
-");
-$attendanceStmt->bindParam(':lecturer_id', $lecturer_id, PDO::PARAM_INT);
-$attendanceStmt->execute();
-$attendanceRecords = $attendanceStmt->fetchAll(PDO::FETCH_ASSOC);
+    // Fetch the total number of students across all assigned courses
+    $stmt = $conn->prepare("
+        SELECT COUNT(DISTINCT sc.student_id) AS total_students
+        FROM student_courses sc
+        JOIN courses c ON sc.course_id = c.course_id
+        WHERE c.lecturer_id = :lecturer_id
+    ");
+    $stmt->bindParam(':lecturer_id', $lecturer_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $total_students = $stmt->fetchColumn();
+
+    // Fetch courses and student counts
+    $stmt = $conn->prepare("
+        SELECT c.course_code, c.course_name, 
+               (SELECT COUNT(*) FROM student_courses WHERE course_id = c.course_id) AS student_count
+        FROM courses c
+        WHERE c.lecturer_id = :lecturer_id
+    ");
+    $stmt->bindParam(':lecturer_id', $lecturer_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Database error: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecturer Dashboard</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
             background-color: #f8f9fa;
         }
-        .sidebar {
-            height: 100vh;
-            background-color: #343a40;
-            color: white;
-            padding-top: 20px;
-        }
-        .sidebar a {
-            color: white;
-            padding: 10px;
-            display: block;
-            text-decoration: none;
-        }
-        .sidebar a:hover {
-            background-color: #495057;
-        }
-        .main-content {
-            margin-left: 220px;
-            padding: 20px;
-        }
         .card {
-            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+        }
+        .card h5 {
+            font-weight: bold;
+        }
+        .card p {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: rgb(247, 247, 247);
+        }
+        .btn {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+        }
+        h1 {
+            font-weight: bold;
+            color: #343a40;
+        }
+        .text-center a {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-
-    <!-- Header -->
-    <nav class="navbar navbar-light bg-light">
-        <a class="navbar-brand" href="#">
-            <img src="../assets/logo/download.jfif" width="30" height="30" class="d-inline-block align-top" alt=""> UMYUK
-        </a>
-        <span class="navbar-text">
-            <img src="../assets/logo/user-icn.png" width="30" height="30" class="rounded-circle" alt=""> <?php echo htmlspecialchars($lecturer_name); ?>
-        </span>
-    </nav>
-
-    <!-- Sidebar -->
-    <div class="d-flex">
-        <div class="sidebar p-3">
-            <h4>Dashboard</h4>
-            <a href="#">Home</a>
-            <!-- <a href="#">Courses Taught</a> -->
-            <a href="#">Mark Attendance</a>
-            <!-- <a href="#">Attendance Reports</a> -->
-            <a href="#">Generate XML Report</a>
-            <a href="profile.php">Profile</a>
-            <a href="../logout.php">Logout</a>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content container-fluid">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="card text-white bg-info">
-                        <div class="card-body">
-                            <h5 class="card-title">Courses</h5>
-                            <p class="card-text"><?php echo $course_count; ?> Courses</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3">
-                    <div class="card text-white bg-success">
-                        <div class="card-body">
-                            <h5 class="card-title">Students</h5>
-                            <p class="card-text"><?php echo $student_count; ?> Students</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3">
-                    <div class="card text-white bg-danger">
-                        <div class="card-body">
-                            <h5 class="card-title">Reports</h5>
-                            <p class="card-text">4 Generated</p>
-                        </div>
-                    </div>
+<div class="container mt-5">
+    <h1 class="text-center">Lecturer Dashboard</h1>
+    <div class="row text-center mt-4">
+        <div class="col-md-6">
+            <div class="card shadow bg-info text-white">
+                <div class="card-body">
+                    <h5>Total Courses Assigned</h5>
+                    <p><?php echo $total_courses; ?></p>
                 </div>
             </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow bg-success text-white">
+                <div class="card-body">
+                    <h5>Total Students Across Courses</h5>
+                    <p><?php echo $total_students; ?></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
-            <!-- Courses Taught -->
-            <h3>Courses Taught</h3>
+    <!-- Manage Attendance Section -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3>Manage Attendance</h3>
             <table class="table table-bordered">
-                <thead class="thead-dark">
+                <thead>
                     <tr>
                         <th>Course Code</th>
                         <th>Course Name</th>
-                        <th>Action</th>
+                        <th>Students Enrolled</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($courses)): ?>
-                        <?php foreach ($courses as $course): ?>
+                    <?php if (!empty($courses)) : ?>
+                        <?php foreach ($courses as $course) : ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($course['course_code']); ?></td>
                                 <td><?php echo htmlspecialchars($course['course_name']); ?></td>
+                                <td><?php echo htmlspecialchars($course['student_count']); ?> Student(s)</td>
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-primary">Mark Attendance</a>
-                                    <a href="#" class="btn btn-sm btn-secondary">View Report</a>
+                                    <div class="attendance-btn">
+                                        <a href="mark_attendance.php?course_id=<?php echo urlencode($course['course_code']); ?>" class="btn btn-primary">Mark Attendance</a>
+                                        <a href="view_attendance.php?course_id=<?php echo urlencode($course['course_code']); ?>" class="btn btn-secondary">View Attendance Report</a>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         <tr>
-                            <td colspan="3">No courses assigned</td>
+                            <td colspan="4">No courses assigned.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
-
-            <!-- Recent Attendance Activity -->
-            <h3>Attendance Records</h3>
-            <ul class="list-group">
-                <?php if (!empty($attendanceRecords)): ?>
-                    <?php foreach ($attendanceRecords as $record): ?>
-                        <li class="list-group-item">
-                            Marked attendance for <?php echo htmlspecialchars($record['course_name']); ?> - Total Attendance: <?php echo $record['total_attendance']; ?>
-                        </li>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <li class="list-group-item">No attendance records found</li>
-                <?php endif; ?>
-            </ul>
         </div>
     </div>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
-<?php
-include_once '../includes/footer.php';
-footer::display();
-?>
+<?php include 'footer.php'; ?>
