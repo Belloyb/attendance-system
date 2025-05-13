@@ -54,36 +54,46 @@ $totalAttendanceRecords = $attendanceModel->getTotalAttendanceRecords();
 
 ?>
 
-<div class="container mt-5">
-    <h1>Admin Dashboard</h1>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
     
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Total Users</h5>
-                    <p class="card-text"><?php echo $totalUsers; ?></p>
+    <!-- Offline Bootstrap CSS -->
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Admin Dashboard</h1>
+        
+        <div class="row">
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Users</h5>
+                        <p class="card-text"><?php echo $totalUsers; ?></p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Total Courses</h5>
-                    <p class="card-text"><?php echo $totalCourses; ?></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Total Attendance Records</h5>
-                    <p class="card-text"><?php echo $totalAttendanceRecords; ?></p>
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Courses</h5>
+                        <p class="card-text"><?php echo $totalCourses; ?></p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Offline Bootstrap JS -->
+    <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
 <?php include '../includes/footer.php'; 
 

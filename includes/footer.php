@@ -6,7 +6,7 @@ class Footer {
         <footer class=" text-center text-lg-start mt-auto">
             <div class="container p-4">
                 <div class="text-center p-3">
-                    &copy; 2024 Attendance System. All rights reserved.
+                    &copy; 2025 Attendance System. All rights reserved.
                 </div>
             </div>
         </footer>

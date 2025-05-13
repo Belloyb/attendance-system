@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- phpMyAdmin XML Dump
+- version 5.1.0
+- https://www.phpmyadmin.net
+-
+- Host: 127.0.0.1
+- Generation Time: Jan 08, 2025 at 01:41 PM
+- Server version: 10.4.18-MariaDB
+- PHP Version: 8.0.3
+-->
+
+<pma_xml_export version="1.0" xmlns:pma="https://www.phpmyadmin.net/some_doc_url/">
+    <!--
+    - Structure schemas
+    -->
+    <pma:structure_schemas>
+        <pma:database name="attendance_db" collation="utf8mb4_general_ci" charset="utf8mb4">
+            <pma:table name="attendance">
+                CREATE TABLE `attendance` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `course_id` int(11) NOT NULL,
+                  `student_id` int(11) NOT NULL,
+                  `lecturer_id` int(11) NOT NULL,
+                  `attendance_date` date NOT NULL,
+                  `status` varchar(10) NOT NULL,
+                  PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4;
+            </pma:table>
+            <pma:table name="attendance_records">
+                CREATE TABLE `attendance_records` (
+                  `record_id` int(11) NOT NULL,
+                  `student_id` int(11) DEFAULT NULL,
+                  `course_code` varchar(20) DEFAULT NULL,
+                  `date` date NOT NULL,
+                  `status` enum('present','absent') NOT NULL
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            </pma:table>
+            <pma:table name="courses">
+                CREATE TABLE `courses` (
+                  `course_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `course_name` varchar(100) NOT NULL,
+                  `course_code` varchar(20) NOT NULL,
+                  `lecturer_id` int(11) DEFAULT NULL,
+                  `semester` varchar(20) NOT NULL,
+                  `level` varchar(10) NOT NULL,
+                  PRIMARY KEY (`course_id`),
+                  UNIQUE KEY `course_code` (`course_code`),
+                  KEY `lecturer_id` (`lecturer_id`),
+                  CONSTRAINT `courses_ibfk_1` FOREIGN KEY (`lecturer_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE
+                ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+            </pma:table>
+            <pma:table name="departments">
+                CREATE TABLE `departments` (
+                  `department_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `department_name` varchar(100) NOT NULL,
+                  PRIMARY KEY (`department_id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            </pma:table>
+            <pma:table name="eligibility">
+                CREATE TABLE `eligibility` (
+                  `eligibility_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `student_id` int(11) DEFAULT NULL,
+                  `course_id` int(11) DEFAULT NULL,
+                  `eligibility_status` enum('eligible','ineligible') NOT NULL,
+                  `attendance_percentage` decimal(5,2) NOT NULL,
+                  PRIMARY KEY (`eligibility_id`),
+                  KEY `student_id` (`student_id`),
+                  KEY `course_id` (`course_id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            </pma:table>
+            <pma:table name="enrollments">
+                CREATE TABLE `enrollments` (
+                  `enrollment_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `student_id` int(11) DEFAULT NULL,
+                  `course_id` int(11) DEFAULT NULL,
+                  PRIMARY KEY (`enrollment_id`),
+                  KEY `student_id` (`student_id`),
+                  KEY `course_id` (`course_id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            </pma:table>
+            <pma:table name="students">
+                CREATE TABLE `students` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `fullname` varchar(100) NOT NULL,
+                  `req_no` varchar(20) NOT NULL,
+                  `password` varchar(255) NOT NULL,
+                  `level` varchar(10) NOT NULL,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `req_no` (`req_no`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+            </pma:table>
+            <pma:table name="student_courses">
+                CREATE TABLE `student_courses` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `student_id` int(11) NOT NULL,
+                  `course_id` int(11) NOT NULL,
+                  `enrollment_date` date NOT NULL,
+                  PRIMARY KEY (`id`),
+                  KEY `student_id` (`student_id`),
+                  KEY `course_id` (`course_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4;
+            </pma:table>
+            <pma:table name="users">
+                CREATE TABLE `users` (
+                  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `username` varchar(50) NOT NULL,
+                  `full_name` varchar(100) NOT NULL,
+                  `email` varchar(100) NOT NULL,
+                  `role` enum('admin','lecturer') NOT NULL,
+                  `password` varchar(255) NOT NULL,
+                  PRIMARY KEY (`user_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+            </pma:table>
+        </pma:database>
+    </pma:structure_schemas>
+
+    <!--
+    - Database: 'attendance_db'
+    -->
+    <database name="attendance_db">
+        <!-- Table attendance -->
+        <table name="attendance">
+            <column name="id">1</column>
+            <column name="course_id">1</column>
+            <column name="student_id">1</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-07</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">2</column>
+            <column name="course_id">1</column>
+            <column name="student_id">1</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">absent</column>
+        </table>
+        <table name="attendance">
+            <column name="id">3</column>
+            <column name="course_id">1</column>
+            <column name="student_id">2</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">4</column>
+            <column name="course_id">1</column>
+            <column name="student_id">3</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">5</column>
+            <column name="course_id">1</column>
+            <column name="student_id">4</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">6</column>
+            <column name="course_id">1</column>
+            <column name="student_id">5</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">7</column>
+            <column name="course_id">1</column>
+            <column name="student_id">1</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">8</column>
+            <column name="course_id">1</column>
+            <column name="student_id">2</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">absent</column>
+        </table>
+        <table name="attendance">
+            <column name="id">9</column>
+            <column name="course_id">1</column>
+            <column name="student_id">3</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">10</column>
+            <column name="course_id">1</column>
+            <column name="student_id">4</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">11</column>
+            <column name="course_id">1</column>
+            <column name="student_id">5</column>
+            <column name="lecturer_id">2</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">absent</column>
+        </table>
+        <table name="attendance">
+            <column name="id">12</column>
+            <column name="course_id">2</column>
+            <column name="student_id">2</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">13</column>
+            <column name="course_id">2</column>
+            <column name="student_id">1</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">14</column>
+            <column name="course_id">2</column>
+            <column name="student_id">3</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">absent</column>
+        </table>
+        <table name="attendance">
+            <column name="id">15</column>
+            <column name="course_id">2</column>
+            <column name="student_id">4</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">16</column>
+            <column name="course_id">2</column>
+            <column name="student_id">5</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">absent</column>
+        </table>
+        <table name="attendance">
+            <column name="id">17</column>
+            <column name="course_id">2</column>
+            <column name="student_id">2</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">18</column>
+            <column name="course_id">2</column>
+            <column name="student_id">1</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">absent</column>
+        </table>
+        <table name="attendance">
+            <column name="id">19</column>
+            <column name="course_id">2</column>
+            <column name="student_id">3</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">20</column>
+            <column name="course_id">2</column>
+            <column name="student_id">4</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">absent</column>
+        </table>
+        <table name="attendance">
+            <column name="id">21</column>
+            <column name="course_id">2</column>
+            <column name="student_id">5</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">22</column>
+            <column name="course_id">2</column>
+            <column name="student_id">2</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">absent</column>
+        </table>
+        <table name="attendance">
+            <column name="id">23</column>
+            <column name="course_id">2</column>
+            <column name="student_id">1</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">24</column>
+            <column name="course_id">2</column>
+            <column name="student_id">3</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">absent</column>
+        </table>
+        <table name="attendance">
+            <column name="id">25</column>
+            <column name="course_id">2</column>
+            <column name="student_id">4</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">26</column>
+            <column name="course_id">2</column>
+            <column name="student_id">5</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">27</column>
+            <column name="course_id">2</column>
+            <column name="student_id">2</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">28</column>
+            <column name="course_id">2</column>
+            <column name="student_id">1</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">29</column>
+            <column name="course_id">2</column>
+            <column name="student_id">3</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">30</column>
+            <column name="course_id">2</column>
+            <column name="student_id">4</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <table name="attendance">
+            <column name="id">31</column>
+            <column name="course_id">2</column>
+            <column name="student_id">5</column>
+            <column name="lecturer_id">3</column>
+            <column name="attendance_date">2025-01-08</column>
+            <column name="status">present</column>
+        </table>
+        <!-- Table attendance_records -->
+        <!-- Table courses -->
+        <table name="courses">
+            <column name="course_id">1</column>
+            <column name="course_name">AI</column>
+            <column name="course_code">csc 4311</column>
+            <column name="lecturer_id">2</column>
+            <column name="semester">1</column>
+            <column name="level">400</column>
+        </table>
+        <table name="courses">
+            <column name="course_id">2</column>
+            <column name="course_name">Database</column>
+            <column name="course_code">CSC 4313</column>
+            <column name="lecturer_id">3</column>
+            <column name="semester">1</column>
+            <column name="level">400</column>
+        </table>
+        <table name="courses">
+            <column name="course_id">4</column>
+            <column name="course_name">Networking</column>
+            <column name="course_code">CSC 4303</column>
+            <column name="lecturer_id">4</column>
+            <column name="semester">1</column>
+            <column name="level">400</column>
+        </table>
+        <!-- Table departments -->
+        <!-- Table eligibility -->
+        <!-- Table enrollments -->
+        <!-- Table students -->
+        <table name="students">
+            <column name="id">1</column>
+            <column name="fullname">Student1</column>
+            <column name="req_no">001</column>
+            <column name="password">$2y$10$3tw34FHAbJXVrOZFy8dJCORo5ZEOOTNlheCXgR2YSGySPf9/y8C86</column>
+            <column name="level">400</column>
+        </table>
+        <table name="students">
+            <column name="id">2</column>
+            <column name="fullname">Student2</column>
+            <column name="req_no">002</column>
+            <column name="password">$2y$10$XEMwsKptOodIo9.I6Bk87ehYi.kQHXi0zCYGaiN6wfzFrbb9lyTfi</column>
+            <column name="level">400</column>
+        </table>
+        <table name="students">
+            <column name="id">3</column>
+            <column name="fullname">Student3</column>
+            <column name="req_no">003</column>
+            <column name="password">$2y$10$CDWEygScJ/lNgBtcRKQsO.WrhH23a8cp9QohlhC3CnuIZXSY.S7tW</column>
+            <column name="level">400</column>
+        </table>
+        <table name="students">
+            <column name="id">4</column>
+            <column name="fullname">student4</column>
+            <column name="req_no">004</column>
+            <column name="password">$2y$10$A7M/LtElBPYlF2I9dCc7vuH/mzRij6t8pZJro6VfMwgBHXGnUUduS</column>
+            <column name="level">400</column>
+        </table>
+        <table name="students">
+            <column name="id">5</column>
+            <column name="fullname">Student5</column>
+            <column name="req_no">005</column>
+            <column name="password">$2y$10$.R4bnDj2dyt3mVYD1n21L.isixEg5xmBZMcbu4QHlVw8gi8s.3HOy</column>
+            <column name="level">400</column>
+        </table>
+        <!-- Table student_courses -->
+        <table name="student_courses">
+            <column name="id">1</column>
+            <column name="student_id">1</column>
+            <column name="course_id">1</column>
+            <column name="enrollment_date">2025-01-07</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">2</column>
+            <column name="student_id">2</column>
+            <column name="course_id">1</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">3</column>
+            <column name="student_id">2</column>
+            <column name="course_id">2</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">4</column>
+            <column name="student_id">2</column>
+            <column name="course_id">4</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">5</column>
+            <column name="student_id">1</column>
+            <column name="course_id">2</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">6</column>
+            <column name="student_id">1</column>
+            <column name="course_id">4</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">7</column>
+            <column name="student_id">3</column>
+            <column name="course_id">4</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">8</column>
+            <column name="student_id">3</column>
+            <column name="course_id">1</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">9</column>
+            <column name="student_id">3</column>
+            <column name="course_id">2</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">10</column>
+            <column name="student_id">4</column>
+            <column name="course_id">1</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">11</column>
+            <column name="student_id">4</column>
+            <column name="course_id">4</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">12</column>
+            <column name="student_id">4</column>
+            <column name="course_id">2</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">13</column>
+            <column name="student_id">5</column>
+            <column name="course_id">1</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">14</column>
+            <column name="student_id">5</column>
+            <column name="course_id">2</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <table name="student_courses">
+            <column name="id">15</column>
+            <column name="student_id">5</column>
+            <column name="course_id">4</column>
+            <column name="enrollment_date">2025-01-08</column>
+        </table>
+        <!-- Table users -->
+        <table name="users">
+            <column name="user_id">1</column>
+            <column name="username">A1</column>
+            <column name="full_name">Admin</column>
+            <column name="email">admin@mail.com</column>
+            <column name="role">admin</column>
+            <column name="password">$2y$10$R3GHP87Go.tMHn66CPJXhu4Ez9ea7SydRUfm27pHowmtk6SPbtQ3u</column>
+        </table>
+        <table name="users">
+            <column name="user_id">2</column>
+            <column name="username">L1</column>
+            <column name="full_name">Lecturer</column>
+            <column name="email">l1@mail.com</column>
+            <column name="role">lecturer</column>
+            <column name="password">$2y$10$bpnUdXa.gBPc6dw7.2CmSuT47M2HdjekHxFnl8s03XcP2xXEbR806</column>
+        </table>
+        <table name="users">
+            <column name="user_id">3</column>
+            <column name="username">L2</column>
+            <column name="full_name">Lecturer2</column>
+            <column name="email">l2@gmail.com</column>
+            <column name="role">lecturer</column>
+            <column name="password">$2y$10$pVxw4gyUBejf75r/7chE7um3iXjDYTa71Alnsbi8NRuxLrUbeRD4e</column>
+        </table>
+        <table name="users">
+            <column name="user_id">4</column>
+            <column name="username">L3</column>
+            <column name="full_name">Lecturer3</column>
+            <column name="email">l3@gmail.com</column>
+            <column name="role">lecturer</column>
+            <column name="password">$2y$10$ktM7.4QppF9VbkDARx.KROmAZBfRGRaq0UOHDKpLqpm.PnbDlr5Qm</column>
+        </table>
+    </database>
+</pma_xml_export>
